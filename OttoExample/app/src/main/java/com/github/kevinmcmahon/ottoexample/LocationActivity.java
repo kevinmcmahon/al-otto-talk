@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
+import com.squareup.otto.Produce;
+
 import java.util.Random;
 
 public class LocationActivity extends FragmentActivity {
@@ -35,7 +37,7 @@ public class LocationActivity extends FragmentActivity {
                 lastLatitude = DEFAULT_LAT;
                 lastLongitude = DEFAULT_LON;
 
-                BusProvider.getInstance().post(new LocationChangedEvent(lastLatitude,lastLongitude));
+                BusProvider.getInstance().post(produceLocationEvent());
             }
         });
 
@@ -44,25 +46,30 @@ public class LocationActivity extends FragmentActivity {
             public void onClick(View v) {
                 lastLatitude += (RANDOM.nextFloat() * OFFSET * 2) - OFFSET;
                 lastLongitude += (RANDOM.nextFloat() * OFFSET * 2) - OFFSET;
-                BusProvider.getInstance().post(new LocationChangedEvent(lastLatitude,lastLongitude));
+                BusProvider.getInstance().post(produceLocationEvent());
             }
         });
-
-        // set initial location -- BUT WHY DOESN'T THIS WORK
-        BusProvider.getInstance().post(new LocationChangedEvent(DEFAULT_LAT,DEFAULT_LON));
     }
 
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
 
         // Register ourselves so that we can provide the initial value.
         BusProvider.getInstance().register(this);
     }
 
-    @Override protected void onPause() {
+    @Override
+    protected void onPause() {
         super.onPause();
 
         // Always unregister when an object no longer should be on the bus.
         BusProvider.getInstance().unregister(this);
+    }
+
+    @Produce
+    public LocationChangedEvent produceLocationEvent() {
+        // Provide an initial value for location based on the last known position.
+        return new LocationChangedEvent(lastLatitude, lastLongitude);
     }
 }
