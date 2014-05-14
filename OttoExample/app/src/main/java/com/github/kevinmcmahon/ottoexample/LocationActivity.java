@@ -30,12 +30,12 @@ public class LocationActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 // Rest to default location
+
+                BusProvider.getInstance().post(new LocationClearEvent());
                 lastLatitude = DEFAULT_LAT;
                 lastLongitude = DEFAULT_LON;
-                Location location = new Location(lastLatitude, lastLongitude);
-                mapFragment.setLocation(location);
-                historyFragment.clearLocations();
-                historyFragment.addLocation(location);
+
+                BusProvider.getInstance().post(new LocationChangedEvent(lastLatitude,lastLongitude));
             }
         });
 
@@ -44,25 +44,25 @@ public class LocationActivity extends FragmentActivity {
             public void onClick(View v) {
                 lastLatitude += (RANDOM.nextFloat() * OFFSET * 2) - OFFSET;
                 lastLongitude += (RANDOM.nextFloat() * OFFSET * 2) - OFFSET;
-                Location location = new Location(lastLatitude, lastLongitude);
-                mapFragment.setLocation(location);
-                historyFragment.addLocation(location);
+                BusProvider.getInstance().post(new LocationChangedEvent(lastLatitude,lastLongitude));
             }
         });
 
-        // set initial location
-        Location location = new Location(DEFAULT_LAT, DEFAULT_LON);
-        mapFragment.setLocation(location);
-        historyFragment.addLocation(location);
+        // set initial location -- BUT WHY DOESN'T THIS WORK
+        BusProvider.getInstance().post(new LocationChangedEvent(DEFAULT_LAT,DEFAULT_LON));
     }
 
-    @Override
-    protected void onResume() {
+    @Override protected void onResume() {
         super.onResume();
+
+        // Register ourselves so that we can provide the initial value.
+        BusProvider.getInstance().register(this);
     }
 
-    @Override
-    protected void onPause() {
+    @Override protected void onPause() {
         super.onPause();
+
+        // Always unregister when an object no longer should be on the bus.
+        BusProvider.getInstance().unregister(this);
     }
 }

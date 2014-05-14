@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.otto.Subscribe;
+
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class LocationMapFragment extends Fragment {
@@ -23,11 +25,13 @@ public class LocationMapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        BusProvider.getInstance().register(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        BusProvider.getInstance().unregister(this);
 
         // Stop existing download, if it exists.
         if (downloadTask != null) {
@@ -43,7 +47,8 @@ public class LocationMapFragment extends Fragment {
         return imageView;
     }
 
-    public void setLocation(Location location) {
+    @Subscribe
+    public void onLocationChanged(LocationChangedEvent event) {
         // Stop existing download, if it exists.
         if (downloadTask != null) {
             downloadTask.cancel(true);
@@ -51,7 +56,7 @@ public class LocationMapFragment extends Fragment {
 
         // Trigger a background download of an image for the new location.
         downloadTask = new DownloadTask();
-        downloadTask.execute(String.format(URL, location.latitude, location.longitude));
+        downloadTask.execute(String.format(URL, event.latitude, event.longitude));
     }
 
     private class DownloadTask extends AsyncTask<String, Void, Drawable> {
