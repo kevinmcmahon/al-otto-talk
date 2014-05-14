@@ -10,7 +10,7 @@
 
 ---
 
-![fit](/Users/kevin/Projects/android/al-otto-ex/slides/tightcoupling.png)
+![fit](tightcoupling.png)
 
 ---
 
@@ -45,20 +45,19 @@
 
 ---
 
-
+# _Enter the Event Aggregator_
 
 ---
-## Terminology
 
-- Event
+- Brokers events between components via pub/sub communication
 
-- Subscribing
+- Components (activities, fragments, services) are blissfully ignorant of each other
 
-- Listener
+- Programming to a contract
 
-- Handler method
+---
 
-- Posting an event
+![fit](loosecoupling.png)
 
 ---
 
@@ -185,6 +184,26 @@ public class AndroidBus extends Bus {
 
 --- 
 
-# [fit] @klmcmahon
+# Resources
+
++ http://square.github.io/otto/
++ http://corner.squareup.com/2012/07/otto.html)
++ http://martinfowler.com/eaaDev/EventCollaboration.html
++ https://code.google.com/p/guava-libraries/wiki/EventBusExplained
 
 ---
+
+## Code
+
+## http://j.mp/al-otto-code
+
+--- 
+
+## Slides
+
+## http://j.mp/al-otto-slides
+
+---
+
+# [fit] @klmcmahon
+
