@@ -13,17 +13,34 @@ public class LocationHistoryFragment extends ListFragment {
     private final List<String> locationEvents = new ArrayList<String>();
     private ArrayAdapter<String> adapter;
 
-    @Override public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
     }
 
-    @Override public void onPause() {
+    @Override
+    public void onPause() {
         super.onPause();
     }
 
-    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, locationEvents);
         setListAdapter(adapter);
+    }
+
+    public void addLocation(Location location) {
+        locationEvents.add(0, location.toString());
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    public void clearLocations() {
+        locationEvents.clear();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 }

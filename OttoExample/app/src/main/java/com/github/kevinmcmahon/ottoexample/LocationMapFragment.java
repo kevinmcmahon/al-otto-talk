@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
+import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class LocationMapFragment extends Fragment {
     private static final String URL =
@@ -20,11 +20,13 @@ public class LocationMapFragment extends Fragment {
 
     private ImageView imageView;
 
-    @Override public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
     }
 
-    @Override public void onPause() {
+    @Override
+    public void onPause() {
         super.onPause();
 
         // Stop existing download, if it exists.
@@ -37,11 +39,22 @@ public class LocationMapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         imageView = new ImageView(getActivity());
-        imageView.setScaleType(CENTER_INSIDE);
+        imageView.setScaleType(CENTER_CROP);
         return imageView;
     }
 
-    private static class DownloadTask extends AsyncTask<String, Void, Drawable> {
+    public void setLocation(Location location) {
+        // Stop existing download, if it exists.
+        if (downloadTask != null) {
+            downloadTask.cancel(true);
+        }
+
+        // Trigger a background download of an image for the new location.
+        downloadTask = new DownloadTask();
+        downloadTask.execute(String.format(URL, location.latitude, location.longitude));
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, Drawable> {
         @Override
         protected Drawable doInBackground(String... params) {
             try {
@@ -55,7 +68,9 @@ public class LocationMapFragment extends Fragment {
         @Override
         protected void onPostExecute(Drawable drawable) {
             if (!isCancelled() && drawable != null) {
-                // Write back to main thread to update UI
+                if (imageView != null) {
+                    imageView.setImageDrawable(drawable);
+                }
             }
         }
     }
